@@ -4,7 +4,7 @@
 #include <stdio.h>        // for printf
 #include <stdlib.h>        // for exit
 #include <string.h>        // for bzero
-
+#include <unistd.h>
 #define SERVER_PORT   8000 
 #define LENGTH_OF_LISTEN_QUEUE 20
 #define BUFFER_SIZE 1024

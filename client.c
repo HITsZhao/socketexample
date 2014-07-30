@@ -6,7 +6,7 @@
 #include <stdlib.h>           
 #include <string.h>
 #include <errno.h>
-
+#include <unistd.h>
 #define SERVER_PORT     8000
 #define BUFFER_SIZE     1024
 #define FILE_NAME_MAX_SIZE  512
