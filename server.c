@@ -4,7 +4,7 @@
 #include <stdio.h>        // for printf
 #include <stdlib.h>        // for exit
 #include <string.h>        // for bzero
-//#include <unistd.h>
+#include <unistd.h>
 #define SERVER_PORT   8000 
 #define LENGTH_OF_LISTEN_QUEUE 20
 #define BUFFER_SIZE 1024
@@ -44,6 +44,9 @@ int main(int argc, char **argv)
         printf("Server Listen Failed!");
         exit(1);
     }
+
+    char buffer[BUFFER_SIZE];
+    char char_recv[FILE_NAME_MAX_SIZE];
     while (1) //服务器端要一直运行
     {
     //定义客户端的socket地址结构client_addr
@@ -62,15 +65,28 @@ int main(int argc, char **argv)
 	        break;
 	    }
         printf("Server accepted success!\n");
-		char buffer[BUFFER_SIZE];
-		memset(buffer,0, BUFFER_SIZE);
-		length = recv(new_server_socket,buffer,BUFFER_SIZE,0);
-		if (length < 0)
-		{
-		                                                                                                                                                                        printf("Server Recieve Data Failed!\n");
-		    break;
-		}
-		char file_name[FILE_NAME_MAX_SIZE+1];
+        while(1)
+        {
+		    memset(buffer,0, BUFFER_SIZE);
+		    length = recv(new_server_socket,buffer,BUFFER_SIZE,0);
+		    if (length < 0)
+		    {
+	            printf("Server Recieve Data Failed!\n");
+		         break;
+		    }
+            memset(char_recv,0,FILE_NAME_MAX_SIZE);
+            strncpy(char_recv,buffer,strlen(buffer)>FILE_NAME_MAX_SIZE?FILE_NAME_MAX_SIZE:strlen(buffer));
+            printf("Q: %s\n",char_recv);
+            memset(buffer,0,BUFFER_SIZE);
+            memcpy(buffer,char_recv,FILE_NAME_MAX_SIZE);
+            if(send(new_server_socket,buffer,BUFFER_SIZE,0) < 0)
+            {
+                printf("Send Message Failed!\n");
+            }else{
+                printf("Send Message success!\n");
+                printf("A:%s\n",buffer);
+            }
+	   /*	char file_name[FILE_NAME_MAX_SIZE+1];
 		memset(file_name,0, FILE_NAME_MAX_SIZE+1);
 		strncpy(file_name, buffer, strlen(buffer)>FILE_NAME_MAX_SIZE?FILE_NAME_MAX_SIZE:strlen(buffer));
 	
@@ -97,11 +113,12 @@ int main(int argc, char **argv)
             }
             fclose(fp);
             printf("File:\t%s Transfer Finished\n",file_name);
-         }
-       //关闭与客户端的连接
-         close(new_server_socket);
+         }*/
+        }
+        //关闭与客户端的连接
+        close(new_server_socket);
     }
-      //关闭监听用的socket
+    //关闭监听用的socket
     close(server_socket);
     return 0;
 }

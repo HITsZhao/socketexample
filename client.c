@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 {
     if(2 != argc)
     {
-        printf("Usage: %s ServerIPAddress\n",argv[0]);
+        printf("Usage: %s <ServerIPAddress>\n",argv[0]);
         exit(1);
     }
     //设置一个socket地址结构client_addr,代表客户端internet地址，端口
@@ -58,17 +58,31 @@ int main(int argc, char **argv)
         exit(1);
     }    
     
-    //向服务器发送请求
     char file_name[FILE_NAME_MAX_SIZE + 1];
-    memset(file_name,0,FILE_NAME_MAX_SIZE + 1);
-    printf("Please input the file name required in server:\t");
-    scanf("%s",file_name);
     char buffer[BUFFER_SIZE];
-    memset(buffer,0,BUFFER_SIZE);
-    strncpy(buffer,file_name,strlen(file_name)>BUFFER_SIZE? BUFFER_SIZE:strlen(file_name));
+
+    while(1)
+    {
+    //向服务器发送请求
+        memset(file_name,0,FILE_NAME_MAX_SIZE + 1);
+        printf("Q:\t");
+        gets(file_name);
+        //scanf("%s",file_name);
+        //fread(file_name,sizeof(char),FILE_NAME_MAX_SIZE + 1,stdin);
+        memset(buffer,0,BUFFER_SIZE);
+        strncpy(buffer,file_name,strlen(file_name)>BUFFER_SIZE? BUFFER_SIZE:strlen(file_name));
     //向服务器发送buffer中的数据
-    send(client_socket,buffer,BUFFER_SIZE,0);
-    
+        send(client_socket,buffer,BUFFER_SIZE,0);
+        memset(buffer,0,BUFFER_SIZE);
+        int length = recv(client_socket,buffer,BUFFER_SIZE,0);
+        if(length < 0)
+        {
+            printf("Recieve data from server failed !\n");
+            exit(1);
+        }
+        printf("A:%s\n",buffer);
+    }
+    /*
     //接收并保存数据
     //char file_rev_name[FILE_NAME_MAX_SIZE + 1];
     //memset(file_rev_name,0,FILE_NAME_MAX_SIZE + 1);
@@ -100,6 +114,7 @@ int main(int argc, char **argv)
 
     printf("socket: receive file : %s from server [%s] finished !\n",file_name,argv[1]);
     fclose(pFile);
+    */
     //关闭socket
     close(client_socket);
     return 0;
